@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Código QR para abrir en el celular</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Escanea este código QR</h2>
+    <div id="qrcode"></div>
+    <p>o abre manualmente: <br><strong>http://192.168.0.170/APRNONTUELA_PRACTICA/aprnontuela.php</strong></p>
+
+    <script>
+        var qrcode = new QRCode(document.getElementById("qrcode"), {
+            text: "http://192.168.1.123/APRNONTUELA_PRACTICA/aprnontuela.php",
+            width: 200,
+            height: 200
+        });
+    </script>
+</body>
+</html>
+

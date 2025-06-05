@@ -1,0 +1,470 @@
+<?php
+require 'conexionapr.php'; // Conexión a base de datos
+require_once('tcpdf/tcpdf.php'); // Clase TCPDF para generar PDF
+session_start();
+// Primero, maneja la acción de cerrar sesión
+if (isset($_GET['seccion']) && $_GET['seccion'] === 'cerrar_sesion') {
+    $_SESSION = [];
+    session_destroy();
+    header("Location: login.php"); // Cambia a la página que desees
+    exit();
+}
+if (!isset($_SESSION['usuario'])) {
+    header("Location: login.php");
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>APR NONTUELA</title>
+    <link rel="stylesheet" href="estilo.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body>
+<!--BARRA DE NAVEGACION -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: rgb(58, 96, 174);">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="?seccion=inicio">
+            <img src="LOGO.png" alt="Logo APR" width="60" height="60" class="me-2">
+            APR NONTUELA
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNavbar" aria-controls="menuNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="menuNavbar">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="?seccion=inicio">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-house-door me-2" viewBox="0 0 16 16">
+                            <path d="M8.354 1.146a.5.5 0 0 0-.708 0L1 7.793V14.5a.5.5 0 0 0 .5.5H6v-5h4v5h4.5a.5.5 0 0 0 .5-.5V7.793l-6.646-6.647z"/>
+                            <path d="M13 2.5V6l-5-5-5 5V2.5A1.5 1.5 0 0 1 4.5 1h7A1.5 1.5 0 0 1 13 2.5z"/>
+                        </svg>
+                        Inicio
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="?seccion=registrar_cliente">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-person-plus me-2" viewBox="0 0 16 16">
+                            <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                            <path d="M13 5v2h2v1h-2v2h-1V8h-2V7h2V5z"/>
+                            <path d="M2 13s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H2z"/>
+                        </svg>
+                        Registrar Cliente
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="?seccion=registrar_venta">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-bag me-2" viewBox="0 0 16 16">
+                            <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/>
+                        </svg>
+                        Registrar Venta
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="?seccion=historial_ventas">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-calendar-date me-2" viewBox="0 0 16 16">
+                            <path d="M6.445 11.688V6.354h-.633A13 13 0 0 0 4.5 7.16v.695c.375-.257.969-.62 1.258-.777h.012v4.61z"/>
+                            <path d="M8 8c0-.823.582-1.21 1.168-1.21.633 0 1.16.398 1.16 1.23 0 .696-.559 1.18-1.184 1.18-.601 0-1.144-.383-1.144-1.2z"/>
+                            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5A.5.5 0 0 1 3.5 0z"/>
+                        </svg>
+                        Historial Ventas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="?seccion=consulta_clientes">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-file-person me-2" viewBox="0 0 16 16">
+                            <path d="M12 1a1 1 0 0 1 1 1v10.755S12 11 8 11s-5 1.755-5 1.755V2a1 1 0 0 1 1-1z"/>
+                            <path d="M8 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                        </svg>
+                        Clientes Registrados
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="?seccion=cerrar_sesion">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-box-arrow-right me-2" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M10 15a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0V14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2.5a.5.5 0 0 1-1 0V2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1z"/>
+                            <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708L13.172 5H8.5a.5.5 0 0 0 0 1H12.293l2.147 2.146a.5.5 0 0 0 .707 0z"/>
+                        </svg>
+                        Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<?php
+$seccion = $_GET['seccion'] ?? 'inicio';
+ if ($seccion == 'inicio') {
+        ?>
+        <div class="container d-flex flex-column justify-content-center align-items-center" style="min-height: 70vh; text-align:center;">
+        <h1 class="display-4 mb-3">¡Bienvenido a APR Nontuela!</h1>
+        <p class="lead">Aquí podrás gestionar clientes, registrar ventas y consultar el historial fácilmente.</p>
+        <img src="LOGO.png" alt="Logo APR" style="width: 200px; margin-top: 1px;">
+        </div>
+        <?php
+    }
+    if ($seccion == 'registrar_cliente') {
+        ?>
+        <!-- Formulario de registro de cliente -->
+        <div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+            <form action="registroclientes.php" method="POST" class="p-4 border rounded shadow bg-light" style="max-width: 400px; width: 100%; margin-top:12px">
+                <h2 class="titulo-animado mb-4 text-center">Registrar Cliente</h2>
+                <div class="mb-3">
+                    <label class="form-label">Cliente</label>
+                    <input type="text" name="nombrecliente" class="form-control" placeholder="Nombre cliente" minlength="3" maxlength="30" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Correo</label>
+                    <input type="email" name="correocliente" class="form-control" placeholder="Correo cliente"  maxlength="300" minlength="2" title="Ingrese un correo válido" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">RUT</label>
+                    <input type="text" id="rut" name="rut" class="form-control" maxlength="12" pattern="\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]" placeholder="12.345.678-5" title="Ingrese un RUT válido (formato: 12.345.678-5)" oninput="formatearRut(this)" required>
+
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Contacto</label>
+                    <input type="text" name="contacto" class="form-control" pattern="\d{9}" maxlength="9" placeholder="912345678" title="Debe contener exactamente 9 dígitos" required>
+                </div>
+                <button type="submit" name="registrarcliente" class="btn btn-primary w-100">Registrar</button>
+            </form>
+        </div>
+        <script>
+            function formatearRut(input) {
+            let valor = input.value.replace(/\./g, '').replace('-', '').replace(/[^0-9kK]/g, '');
+            if (valor.length > 1) {
+                let cuerpo = valor.slice(0, -1);
+                let dv = valor.slice(-1).toUpperCase();
+                input.value = cuerpo
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ".") + '-' + dv;
+            } else {
+                input.value = valor;
+            }
+            }
+        </script>
+<?php
+    } elseif ($seccion == 'registrar_venta') {
+        ?>
+        <!-- Formulario de registro de venta -->
+        <div class="container d-flex justify-content-center align-items-center" style="max-width: 500px; margin: auto; width:90%">
+            <form action="registroventas.php" method="POST" class="p-4 border rounded shadow bg-light" style="max-width: 400px; width: 90%; margin-top: 12px">
+                <h2 class="titulo-animado mb-4 text-center">Registrar Venta</h2>
+                <div class="mb-3">
+                    <label class="form-label">RUT Cliente</label>
+                    <input type="text" name="rut_cliente" class="form-control" placeholder="12.345.678-5" maxlength="12" pattern="\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]"  title="Ingrese un RUT válido (formato: 12.345.678-5)" oninput="formatearRut(this)" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Nombre Cliente</label>
+                    <input type="text" name="nombre_cliente" class="form-control" placeholder="Nombre completo" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Total Metros Cúbicos</label>
+                    <input type="number" name="metros_cubicos" class="form-control" min="1" placeholder="Metros Cúbicos" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Valor Metro Cúbico</label>
+                    <input type="number" step="0.01" name="valor_m3" class="form-control" min="0" placeholder="Valor por metro cúbico" required>
+                </div>
+                <button type="submit" name="registrarventa" class="btn btn-primary w-100">Registrar Venta</button>
+            </form>
+        </div>
+        <script>
+        function formatearRut(input) {
+            let valor = input.value.replace(/\./g, '').replace('-', '').replace(/[^0-9kK]/g, '');
+            if (valor.length > 1) {
+                let cuerpo = valor.slice(0, -1);
+                let dv = valor.slice(-1).toUpperCase();
+                input.value = cuerpo
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ".") + '-' + dv;
+            } else {
+                input.value = valor;
+            }
+            }
+            </script>
+        <?php
+    } elseif ($seccion == 'historial_ventas') {
+    $mostrar_tabla = false;
+    $resultado = null;
+    $condiciones = [];
+    $filtro = "";
+
+    $form_enviado = !empty($_GET['fecha_inicio']) || !empty($_GET['fecha_fin']) || !empty($_GET['rut_cliente']) || !empty($_GET['ver_todo']);
+
+    if ($form_enviado) {
+        if (!empty($_GET['ver_todo'])) {
+            $filtro = "";
+        } else {
+            if (!empty($_GET['fecha_inicio']) && !empty($_GET['fecha_fin'])) {
+                $fecha_inicio = $_GET['fecha_inicio'];
+                $fecha_fin = $_GET['fecha_fin'];
+                $condiciones[] = "fecha_venta BETWEEN '$fecha_inicio 00:00:00' AND '$fecha_fin 23:59:59'";
+            }
+            if (!empty($_GET['rut_cliente'])) {
+                $rut_cliente = mysqli_real_escape_string($conexion, $_GET['rut_cliente']);
+                $condiciones[] = "rut_cliente LIKE '%$rut_cliente%'";
+            }
+            if (!empty($condiciones)) {
+                $filtro = "WHERE " . implode(" AND ", $condiciones);
+            }
+        }
+
+        $consulta = "SELECT * FROM ventas $filtro ORDER BY fecha_venta DESC";
+        $resultado = mysqli_query($conexion, $consulta);
+        $mostrar_tabla = true;
+    }
+?>
+<div class="container my-5">
+
+    <!-- Formulario de filtros -->
+    <div class="card bg-light p-4 shadow mb-4" style="max-width: 400px; margin: auto;">
+        <h2 class="titulo-animado mb-4 text-center">Historial de Ventas</h2>
+        <form method="GET" action="">
+            <input type="hidden" name="seccion" value="historial_ventas">
+
+            <div class="mb-3">
+                <label for="fecha_inicio" class="form-label">Fecha inicio:</label>
+                <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" 
+                    value="<?php echo htmlspecialchars($_GET['fecha_inicio'] ?? '', ENT_QUOTES); ?>">
+            </div>
+
+            <div class="mb-3">
+                <label for="fecha_fin" class="form-label">Fecha fin:</label>
+                <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" 
+                    value="<?php echo htmlspecialchars($_GET['fecha_fin'] ?? '', ENT_QUOTES); ?>">
+            </div>
+
+            <div class="mb-3">
+                <label for="rut_cliente" class="form-label">RUT cliente:</label>
+                <input type="text" class="form-control" id="rut_cliente" name="rut_cliente"
+                    placeholder="Ej: 12.345.678-9" maxlength="12"
+                    pattern="\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]"
+                    title="Ingrese un RUT válido (formato: 12.345.678-5)"
+                    oninput="formatearRut(this)"
+                    value="<?php echo htmlspecialchars($_GET['rut_cliente'] ?? '', ENT_QUOTES); ?>">
+            </div>
+
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="ver_todo" name="ver_todo" value="1"
+                    <?php if (!empty($_GET['ver_todo'])) echo 'checked'; ?>>
+                <label class="form-check-label" for="ver_todo">Ver todo el historial</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        </form>
+    </div>
+
+    <!-- Tabla de resultados con selección -->
+    <?php if ($mostrar_tabla && isset($resultado)): ?>
+        <form method="POST" action="pdf_ventas.php" id="formVentas">
+            <input type="hidden" name="modo" value="seleccion">
+            <div class="card bg-light p-4 shadow">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-primary text-center">
+                            <tr>
+                                <th><input type="checkbox" id="seleccionar_todos"></th>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>RUT</th>
+                                <th>Metros³</th>
+                                <th>Valor M³</th>
+                                <th>Total</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (mysqli_num_rows($resultado) > 0): ?>
+                                <?php while ($fila = mysqli_fetch_assoc($resultado)): ?>
+                                    <tr class="text-center">
+                                        <td><input type="checkbox" name="ventas_seleccionadas[]" value="<?php echo $fila['id']; ?>"></td>
+                                        <td><?php echo $fila['id']; ?></td>
+                                        <td><?php echo $fila['nombre_cliente']; ?></td>
+                                        <td><?php echo $fila['rut_cliente']; ?></td>
+                                        <td><?php echo $fila['metros_cubicos']; ?></td>
+                                        <td>$<?php echo number_format($fila['valor_m3'], 0, ',', '.'); ?></td>
+                                        <td>$<?php echo number_format($fila['total'], 0, ',', '.'); ?></td>
+                                        <td><?php echo date('d/m/Y H:i', strtotime($fila['fecha_venta'])); ?></td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr><td colspan="8" class="text-center">No se encontraron resultados para el filtro.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <button type="submit" class="btn btn-danger mt-3">Generar PDF de seleccionados</button>
+            </div>
+        </form>
+    <?php endif; ?>
+</div>
+
+<!-- Scripts -->
+<script>
+    function formatearRut(input) {
+        let valor = input.value.replace(/\./g, '').replace('-', '').replace(/[^0-9kK]/g, '');
+        if (valor.length > 1) {
+            let cuerpo = valor.slice(0, -1);
+            let dv = valor.slice(-1).toUpperCase();
+            input.value = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + '-' + dv;
+        } else {
+            input.value = valor;
+        }
+    }
+
+    document.getElementById('ver_todo').addEventListener('change', function () {
+        const disabled = this.checked;
+        document.getElementById('fecha_inicio').disabled = disabled;
+        document.getElementById('fecha_fin').disabled = disabled;
+        document.getElementById('rut_cliente').disabled = disabled;
+    });
+
+    window.addEventListener('DOMContentLoaded', function () {
+        const checkbox = document.getElementById('ver_todo');
+        if (checkbox.checked) {
+            document.getElementById('fecha_inicio').disabled = true;
+            document.getElementById('fecha_fin').disabled = true;
+            document.getElementById('rut_cliente').disabled = true;
+        }
+    });
+
+    document.querySelector('form[action=""]').addEventListener('submit', function (e) {
+        const verTodo = document.getElementById('ver_todo').checked;
+        const fechaInicio = document.getElementById('fecha_inicio').value;
+        const fechaFin = document.getElementById('fecha_fin').value;
+        const rutCliente = document.getElementById('rut_cliente').value.trim();
+
+        if (!verTodo && fechaInicio === '' && fechaFin === '' && rutCliente === '') {
+            e.preventDefault();
+            alert('Por favor, seleccione al menos un filtro o marque "Ver todo el historial".');
+        }
+    });
+
+    document.getElementById('seleccionar_todos')?.addEventListener('change', function () {
+        const checkboxes = document.querySelectorAll('input[name="ventas_seleccionadas[]"]');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+
+    document.getElementById('formVentas')?.addEventListener('submit', function (e) {
+        const seleccionados = document.querySelectorAll('input[name="ventas_seleccionadas[]"]:checked');
+        if (seleccionados.length === 0) {
+            e.preventDefault();
+            alert('Por favor, seleccione al menos una venta para generar el PDF.');
+        }
+    });
+</script>
+<?php } 
+if ($seccion == 'consulta_clientes') {
+    $resultado = null;
+    $filtro = "";
+    $rut_cliente = "";
+    $ver_todos = !empty($_GET['ver_todos']);
+
+    if (!empty($_GET['rut_cliente']) || $ver_todos) {
+        if ($ver_todos) {
+            $filtro = "";
+        } else {
+            $rut_cliente = mysqli_real_escape_string($conexion, $_GET['rut_cliente']);
+            $filtro = "WHERE Rut LIKE '%$rut_cliente%'";
+        }
+
+        $consulta = "SELECT * FROM clientes $filtro ORDER BY Nombre ASC";
+        $resultado = mysqli_query($conexion, $consulta);
+    }
+?>
+<div class="container my-5">
+    <div class="card bg-light p-4 shadow mb-4" style="max-width: 400px; margin: auto;">
+        <h2 class="titulo-animado mb-4 text-center">Consulta de Clientes</h2>
+        <form method="GET" action="">
+            <input type="hidden" name="seccion" value="consulta_clientes">
+
+            <div class="mb-3">
+                <label for="rut_cliente" class="form-label">Buscar por RUT:</label>
+                <input type="text" class="form-control" id="rut_cliente" name="rut_cliente" placeholder="Ej: 12.345.678-9" maxlength="12" pattern="\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]" value="<?php echo $rut_cliente; ?>" oninput="formatearRut(this)" <?php if ($ver_todos) echo 'disabled'; ?>>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="ver_todos" name="ver_todos" value="1" <?php if ($ver_todos) echo 'checked'; ?>>
+                <label class="form-check-label" for="ver_todos">Ver todos los clientes</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Buscar</button>
+        </form>
+    </div>
+
+    <script>
+        function formatearRut(input) {
+            let valor = input.value.replace(/\./g, '').replace('-', '').replace(/[^0-9kK]/g, '');
+            if (valor.length > 1) {
+                let cuerpo = valor.slice(0, -1);
+                let dv = valor.slice(-1).toUpperCase();
+                input.value = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + '-' + dv;
+            } else {
+                input.value = valor;
+            }
+        }
+
+        document.getElementById('ver_todos').addEventListener('change', function () {
+            document.getElementById('rut_cliente').disabled = this.checked;
+        });
+
+        // Al cargar la página
+        window.addEventListener('DOMContentLoaded', function () {
+            if (document.getElementById('ver_todos').checked) {
+                document.getElementById('rut_cliente').disabled = true;
+            }
+        });
+    </script>
+
+    <?php if ($resultado): ?>
+        <div class="card bg-light p-4 shadow mt-4">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-secondary text-center">
+                        <tr>
+                            <th>RUT</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Contacto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (mysqli_num_rows($resultado) > 0): ?>
+                            <?php while ($fila = mysqli_fetch_assoc($resultado)): ?>
+                                <tr class="text-center">
+                                    <td><?php echo $fila['Rut']; ?></td>
+                                    <td><?php echo $fila['Nombre']; ?></td>
+                                    <td><?php echo $fila['Email']; ?></td>
+                                    <td><?php echo $fila['Contacto']; ?></td>
+                                </tr>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <tr><td colspan="4" class="text-center">No se encontraron clientes.</td></tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <?php if (mysqli_num_rows($resultado) > 0): ?>
+                <form method="GET" action="generar_pdf_clientes.php" target="_blank" class="text-center mt-3">
+                    <input type="hidden" name="rut_cliente" value="<?php echo $rut_cliente; ?>">
+                    <?php if ($ver_todos): ?>
+                        <input type="hidden" name="ver_todos" value="1">
+                    <?php endif; ?>
+                    <button type="submit" class="btn btn-danger">Generar PDF</button>
+                </form>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+</div>
+<?php
+}
+?>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
