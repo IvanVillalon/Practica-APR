@@ -93,6 +93,15 @@ footer{
     text-align: center;
     padding: 20px;
 }
+.icono-nav {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
 /* Animación opcional */
 @keyframes brillo {
     from {

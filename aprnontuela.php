@@ -27,6 +27,7 @@ if (!isset($_SESSION['usuario'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body>
+    <div id="fondo3d"></div>
 <!--BARRA DE NAVEGACION -->
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: rgb(58, 96, 174);">
     <div class="container">
@@ -37,67 +38,107 @@ if (!isset($_SESSION['usuario'])) {
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNavbar" aria-controls="menuNavbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="menuNavbar">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="?seccion=inicio">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-house-door me-2" viewBox="0 0 16 16">
-                            <path d="M8.354 1.146a.5.5 0 0 0-.708 0L1 7.793V14.5a.5.5 0 0 0 .5.5H6v-5h4v5h4.5a.5.5 0 0 0 .5-.5V7.793l-6.646-6.647z"/>
-                            <path d="M13 2.5V6l-5-5-5 5V2.5A1.5 1.5 0 0 1 4.5 1h7A1.5 1.5 0 0 1 13 2.5z"/>
-                        </svg>
-                        Inicio
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="?seccion=registrar_cliente">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-person-plus me-2" viewBox="0 0 16 16">
-                            <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-                            <path d="M13 5v2h2v1h-2v2h-1V8h-2V7h2V5z"/>
-                            <path d="M2 13s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H2z"/>
-                        </svg>
-                        Registrar Cliente
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="?seccion=registrar_venta">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-bag me-2" viewBox="0 0 16 16">
-                            <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/>
-                        </svg>
-                        Registrar Venta
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="?seccion=historial_ventas">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-calendar-date me-2" viewBox="0 0 16 16">
-                            <path d="M6.445 11.688V6.354h-.633A13 13 0 0 0 4.5 7.16v.695c.375-.257.969-.62 1.258-.777h.012v4.61z"/>
-                            <path d="M8 8c0-.823.582-1.21 1.168-1.21.633 0 1.16.398 1.16 1.23 0 .696-.559 1.18-1.184 1.18-.601 0-1.144-.383-1.144-1.2z"/>
-                            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5A.5.5 0 0 1 3.5 0z"/>
-                        </svg>
-                        Historial Ventas
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="?seccion=consulta_clientes">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-file-person me-2" viewBox="0 0 16 16">
-                            <path d="M12 1a1 1 0 0 1 1 1v10.755S12 11 8 11s-5 1.755-5 1.755V2a1 1 0 0 1 1-1z"/>
-                            <path d="M8 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-                        </svg>
-                        Clientes Registrados
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="?seccion=cerrar_sesion">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-box-arrow-right me-2" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M10 15a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0V14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2.5a.5.5 0 0 1-1 0V2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1z"/>
-                            <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708L13.172 5H8.5a.5.5 0 0 0 0 1H12.293l2.147 2.146a.5.5 0 0 0 .707 0z"/>
-                        </svg>
-                        Cerrar Sesión
-                    </a>
-                </li>
-            </ul>
-        </div>
+       <div class="collapse navbar-collapse" id="menuNavbar">
+    <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="?seccion=inicio">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="icono-nav" viewBox="0 0 16 16">
+                    <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4z"/>
+                </svg>
+                Inicio
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="?seccion=registrar_cliente">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="icono-nav" viewBox="0 0 16 16">
+                    <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                    <path d="M13 5v2h2v1h-2v2h-1V8h-2V7h2V5z"/>
+                    <path d="M2 13s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H2z"/>
+                </svg>
+                Registrar Cliente
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="?seccion=registrar_venta">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="icono-nav" viewBox="0 0 16 16">
+                    <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/>
+                </svg>
+                Registrar Venta
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="?seccion=historial_ventas">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="icono-nav" viewBox="0 0 16 16">
+                    <path d="M6.445 11.688V6.354h-.633A13 13 0 0 0 4.5 7.16v.695c.375-.257.969-.62 1.258-.777h.012v4.61z"/>
+                    <path d="M8 8c0-.823.582-1.21 1.168-1.21.633 0 1.16.398 1.16 1.23 0 .696-.559 1.18-1.184 1.18-.601 0-1.144-.383-1.144-1.2z"/>
+                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5A.5.5 0 0 1 3.5 0z"/>
+                </svg>
+                Historial Ventas
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="?seccion=consulta_clientes">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="icono-nav" viewBox="0 0 16 16">
+                    <path d="M12 1a1 1 0 0 1 1 1v10.755S12 11 8 11s-5 1.755-5 1.755V2a1 1 0 0 1 1-1z"/>
+                    <path d="M8 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                </svg>
+                Clientes Registrados
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="?seccion=cerrar_sesion">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="icono-nav" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M10 15a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0V14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2.5a.5.5 0 0 1-1 0V2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1z"/>
+                    <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708L13.172 5H8.5a.5.5 0 0 0 0 1H12.293l2.147 2.146a.5.5 0 0 0 .707 0z"/>
+                </svg>
+                Cerrar Sesión
+            </a>
+        </li>
+    </ul>
+</div>
+
     </div>
 </nav>
+<style>
+    * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+ body {
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+/* Fondo 3D en segundo plano */
+#fondo3d {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.login-container {
+            background-color:rgb(41, 70, 130);
+            padding: 2rem 3rem; 
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+            width: 100%;
+            max-width: 400px;
+            margin: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+  
+</style>
 <?php
 $seccion = $_GET['seccion'] ?? 'inicio';
  if ($seccion == 'inicio') {
@@ -112,8 +153,8 @@ $seccion = $_GET['seccion'] ?? 'inicio';
     if ($seccion == 'registrar_cliente') {
         ?>
         <!-- Formulario de registro de cliente -->
-        <div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
-            <form action="registroclientes.php" method="POST" class="p-4 border rounded shadow bg-light" style="max-width: 400px; width: 100%; margin-top:12px">
+        <div class="login-container " style="min-height: 70vh;">
+            <form action="registroclientes.php" method="POST" >
                 <h2 class="titulo-animado mb-4 text-center">Registrar Cliente</h2>
                 <div class="mb-3">
                     <label class="form-label">Cliente</label>
@@ -152,8 +193,8 @@ $seccion = $_GET['seccion'] ?? 'inicio';
     } elseif ($seccion == 'registrar_venta') {
         ?>
         <!-- Formulario de registro de venta -->
-        <div class="container d-flex justify-content-center align-items-center" style="max-width: 500px; margin: auto; width:90%">
-            <form action="registroventas.php" method="POST" class="p-4 border rounded shadow bg-light" style="max-width: 400px; width: 90%; margin-top: 12px">
+        <div class="login-container" style="max-width: 500px;">
+            <form action="registroventas.php" method="POST" >
                 <h2 class="titulo-animado mb-4 text-center">Registrar Venta</h2>
                 <div class="mb-3">
                     <label class="form-label">RUT Cliente</label>
@@ -222,7 +263,7 @@ $seccion = $_GET['seccion'] ?? 'inicio';
 <div class="container my-5">
 
     <!-- Formulario de filtros -->
-    <div class="card bg-light p-4 shadow mb-4" style="max-width: 400px; margin: auto;">
+    <div class="login-container" style="max-width: 400px; margin: auto;">
         <h2 class="titulo-animado mb-4 text-center">Historial de Ventas</h2>
         <form method="GET" action="">
             <input type="hidden" name="seccion" value="historial_ventas">
@@ -377,8 +418,8 @@ if ($seccion == 'consulta_clientes') {
         $resultado = mysqli_query($conexion, $consulta);
     }
 ?>
-<div class="container my-5">
-    <div class="card bg-light p-4 shadow mb-4" style="max-width: 400px; margin: auto;">
+<div class="login-container"style="max-width: 400px; margin: auto;">
+    
         <h2 class="titulo-animado mb-4 text-center">Consulta de Clientes</h2>
         <form method="GET" action="">
             <input type="hidden" name="seccion" value="consulta_clientes">
@@ -395,8 +436,7 @@ if ($seccion == 'consulta_clientes') {
 
             <button type="submit" class="btn btn-primary w-100">Buscar</button>
         </form>
-    </div>
-
+    
     <script>
         function formatearRut(input) {
             let valor = input.value.replace(/\./g, '').replace('-', '').replace(/[^0-9kK]/g, '');
@@ -464,7 +504,21 @@ if ($seccion == 'consulta_clientes') {
 </div>
 <?php
 }
-?>
+?> <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta/dist/vanta.waves.min.js"></script>
+
+  <!-- Activar el fondo animado -->
+  <script>
+      VANTA.WAVES({
+      el: "#fondo3d",
+      mouseControls: true,
+      touchControls: true,
+      color: 0x0b2a4a,
+      waveHeight: 20,
+      waveSpeed: 1,
+      zoom: 1.2
+    })
+  </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

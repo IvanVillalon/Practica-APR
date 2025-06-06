@@ -3,13 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <title>Iniciar Sesión - APR NONTUELA</title>
-    <link rel="stylesheet" href="estilo.css">
+  
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
+         * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: sans-serif;
+}
+
+/* Fondo 3D en segundo plano */
+#fondo3d {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+/* Contenedor del contenido */
+.contenido {
+  position: relative;
+  z-index: 1;
+  color: white;
+  padding: 2rem;
+  }
         body {
             font-family: 'Poppins', sans-serif;
             height: 100vh;
@@ -19,8 +47,8 @@
             margin: 0;
         }
         .login-container {
-            background-color: #e3edf7;
-            padding: 2rem 3rem;
+            background-color:rgb(41, 70, 130);
+            padding: 2rem 3rem; 
             border-radius: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.7);
             width: 100%;
@@ -34,7 +62,7 @@
         .login-container h2 {
             margin-bottom: 1.5rem;
             font-weight: 700;
-            color: #3a60ae;
+            color:rgb(66, 109, 194);
             text-align: center;
             padding: 1rem 1rem;
         }
@@ -68,6 +96,9 @@
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s ease;
+        }
+        h2{
+            color:rgb(51, 88, 174);
         }
         button:hover {
             background-color: #2b4584;
@@ -119,6 +150,7 @@
     </style>
 </head>
 <body>
+    <div id="fondo3d"></div>
     <div class="login-container"><?php
 session_start();
 if (isset($_SESSION['error'])): ?>
@@ -145,7 +177,21 @@ endif;
   <img src="LOGO.png" alt="Logo APR Nontuela">
   <p>APR NONTUELA</p>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta/dist/vanta.waves.min.js"></script>
 
+  <!-- Activar el fondo animado -->
+  <script>
+      VANTA.WAVES({
+      el: "#fondo3d",
+      mouseControls: true,
+      touchControls: true,
+      color: 0x0b2a4a,
+      waveHeight: 20,
+      waveSpeed: 1,
+      zoom: 1.2
+    })
+  </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
