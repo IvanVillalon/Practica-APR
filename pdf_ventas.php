@@ -45,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ventas_seleccionadas'
                 <th><strong>Valor M³</strong></th>
                 <th><strong>Total</strong></th>
                 <th><strong>Fecha</strong></th>
+                <th><strong>Estado</strong></th>
             </tr>
         </thead>
         <tbody>';
@@ -62,7 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ventas_seleccionadas'
                 <td>$' . number_format($fila['valor_m3'], 0, ',', '.') . '</td>
                 <td>$' . number_format($fila['total'], 0, ',', '.') . '</td>
                 <td>' . date('d/m/Y H:i', strtotime($fila['fecha_venta'])) . '</td>
-            </tr>';
+                <td>' . htmlspecialchars($fila ['Estado']) . '</td>
+                </tr>';
         }
     } else {
         $tbl_body .= '
