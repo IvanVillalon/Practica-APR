@@ -77,6 +77,15 @@ if (!isset($_SESSION['usuario'])) {
             </a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" href="?seccion=estado_ventas">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="icono-nav" viewBox="0 0 16 16">
+                    <path d="M12 1a1 1 0 0 1 1 1v10.755S12 11 8 11s-5 1.755-5 1.755V2a1 1 0 0 1 1-1z"/>
+                    <path d="M8 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                </svg>
+                Estado Venta
+             </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" href="?seccion=consulta_clientes">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="icono-nav" viewBox="0 0 16 16">
                     <path d="M12 1a1 1 0 0 1 1 1v10.755S12 11 8 11s-5 1.755-5 1.755V2a1 1 0 0 1 1-1z"/>
@@ -153,7 +162,7 @@ $seccion = $_GET['seccion'] ?? 'inicio';
     if ($seccion == 'registrar_cliente') {
         ?>
         <!-- Formulario de registro de cliente -->
-        <div class="login-container " style="min-height: 70vh;">
+        <div class="login-container " >
             <form action="registroclientes.php" method="POST" >
                 <h2 class="titulo-animado mb-4 text-center">Registrar Cliente</h2>
                 <div class="mb-3">
@@ -193,7 +202,7 @@ $seccion = $_GET['seccion'] ?? 'inicio';
     } elseif ($seccion == 'registrar_venta') {
         ?>
         <!-- Formulario de registro de venta -->
-        <div class="login-container" style="max-width: 500px;">
+        <div class="login-container">
             <form action="registroventas.php" method="POST" >
                 <h2 class="titulo-animado mb-4 text-center">Registrar Venta</h2>
                 <div class="mb-3">
@@ -260,10 +269,10 @@ $seccion = $_GET['seccion'] ?? 'inicio';
         $mostrar_tabla = true;
     }
 ?>
-<div class="container my-5">
+<div class="login-container my-5">
 
     <!-- Formulario de filtros -->
-    <div class="login-container" style="max-width: 400px; margin: auto;">
+    <div class="container" >
         <h2 class="titulo-animado mb-4 text-center">Historial de Ventas</h2>
         <form method="GET" action="">
             <input type="hidden" name="seccion" value="historial_ventas">
@@ -309,7 +318,7 @@ $seccion = $_GET['seccion'] ?? 'inicio';
                     <table class="table table-bordered table-hover">
                         <thead class="table-primary text-center">
                             <tr>
-                                <th><input type="checkbox" id="seleccionar_todos"></th>
+                                <th></th>
                                 <th>ID</th>
                                 <th>Cliente</th>
                                 <th>RUT</th>
@@ -317,6 +326,7 @@ $seccion = $_GET['seccion'] ?? 'inicio';
                                 <th>Valor M³</th>
                                 <th>Total</th>
                                 <th>Fecha</th>
+                                <th>Estado</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -331,10 +341,11 @@ $seccion = $_GET['seccion'] ?? 'inicio';
                                         <td>$<?php echo number_format($fila['valor_m3'], 0, ',', '.'); ?></td>
                                         <td>$<?php echo number_format($fila['total'], 0, ',', '.'); ?></td>
                                         <td><?php echo date('d/m/Y H:i', strtotime($fila['fecha_venta'])); ?></td>
+                                        <td><?php echo $fila['Estado']; ?></td>
                                     </tr>
                                 <?php endwhile; ?>
                             <?php else: ?>
-                                <tr><td colspan="8" class="text-center">No se encontraron resultados para el filtro.</td></tr>
+                                <tr><td colspan="9" class="text-center">No se encontraron resultados para el filtro.</td></tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -418,7 +429,7 @@ if ($seccion == 'consulta_clientes') {
         $resultado = mysqli_query($conexion, $consulta);
     }
 ?>
-<div class="login-container"style="max-width: 400px; margin: auto;">
+<div class="login-container">
     
         <h2 class="titulo-animado mb-4 text-center">Consulta de Clientes</h2>
         <form method="GET" action="">
@@ -501,12 +512,102 @@ if ($seccion == 'consulta_clientes') {
             <?php endif; ?>
         </div>
     <?php endif; ?>
-</div>
-<?php
+</div><?php
+}if($seccion == 'estado_ventas'){
+    $resultado= null;
+    $filtro= "";
+    $mostrar_tabla= false;
+    $ver_todos = !empty($_GET['ver_todo']);
+    if ($ver_todos) {
+        if(!empty($_GET['ver_todo'])){
+            $filtro= "";
+        }
+        $consulta= "SELECT * FROM ventas $filtro ORDER BY fecha_venta DESC";
+        $resultado = mysqli_query($conexion, $consulta);
+        if (!$resultado) {
+    die("Error en la consulta: " . mysqli_error($conexion));
 }
-?> <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vanta/dist/vanta.waves.min.js"></script>
+        $mostrar_tabla= true;
+    }
+    ?>
+    <div class="container my-5">
+        <form method="GET" action="">
+            <input type="hidden" name="seccion" value="estado_ventas">
+       
+            <button type="submit" class="btn btn-primary w-100" id="ver_todo" name="ver_todo" value="1">Ver Estados</button>
+        </form>
+   <?php if ($mostrar_tabla && isset($resultado)): ?>
+<form method="POST" action="actualizarestado.php" class="form-group">
+    <div class="card bg-light p-4 shadow mt-4">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th></th>
+                        <th>ID</th>
+                        <th>Rut</th>
+                        <th>Cliente</th>
+                        <th>Metros³</th>
+                        <th>Total</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while($fila= mysqli_fetch_assoc($resultado)): ?>
+                        <tr class="text-center">
+                            <td><input type="checkbox" name="ventas_seleccionadas[]" value="<?php echo $fila['id']; ?>"></td>
+                            <td><?php echo $fila['id']; ?></td>
+                            <td><?php echo $fila['rut_cliente']; ?></td>
+                            <td><?php echo $fila['nombre_cliente']; ?></td>
+                            <td><?php echo $fila['metros_cubicos']; ?></td>
+                            <td><?php echo $fila['total']; ?></td>
+                            <td><?php echo date('d/m/Y H:i',strtotime($fila['fecha_venta'])); ?></td>
+                            <td><?php echo $fila['Estado']; ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
 
+        <!-- Select oculto que se mostrará al hacer clic en el botón -->
+        <div id="contenedorSelect" style="display: none;" class="mt-2">
+            <label for="opciones">Elige nuevo estado:</label>
+            <select id="opciones" name="nuevo_estado" class="form-select" required>
+                <option value="">-- Selecciona --</option>
+                <option value="Pagado">Pagado</option>
+                <option value="Deuda">Deuda</option>
+                <option value="Anulado">Anulado</option>
+            </select>
+            <button type="submit" class="btn btn-success mt-2">Guardar Cambios</button>
+        </div>
+
+        <!-- Botón que muestra el select -->
+        <button type="button" class="btn btn-danger mt-3" onclick="mostrarSelect()">Actualizar Estado</button>
+    </div>
+</form>
+<?php endif; ?>
+
+    <?php
+}?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta/dist/vanta.waves.min.js"></script>
+<script>
+document.getElementById('contenedorSelect').addEventListener('submit', function(e) {
+  e.preventDefault(); // Evita que el formulario se recargue
+  document.getElementById('contenedorSelect').style.display = 'block'; // Muestra el select
+
+});
+</script>
+<script>
+function mostrarSelect() {
+    document.getElementById('contenedorSelect').style.display = 'block';
+}
+</script>
+<script> function mostrarSelect(){
+    document.getElementById("contenedorSelect").style.display= "block";
+}
+</script>
   <!-- Activar el fondo animado -->
   <script>
       VANTA.WAVES({
