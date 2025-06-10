@@ -2,7 +2,6 @@
 require_once('tcpdf/tcpdf.php');
 require_once('conexionapr.php');
 
-// Clase personalizada con pie de página con logo
 class MYPDF extends TCPDF {
     public function Footer() {
         $this->SetY(-45);
@@ -18,16 +17,23 @@ class MYPDF extends TCPDF {
     }
 }
 
-// Obtener filtro
-$rut_cliente = isset($_GET['rut_cliente']) ? mysqli_real_escape_string($conexion, $_GET['rut_cliente']) : '';
-$filtro = "";
+// Verificar si llegan clientes seleccionados por POST
+if (!empty($_POST['clientes_seleccionados'])) {
+    $clientes_seleccionados = $_POST['clientes_seleccionados'];
 
-if (!empty($rut_cliente)) {
-    $filtro = "WHERE rut LIKE '%$rut_cliente%'";
+    // Sanitizar y preparar para consulta IN
+    $clientes_limpios = array_map(function($rut) use ($conexion) {
+        return "'" . mysqli_real_escape_string($conexion, $rut) . "'";
+    }, $clientes_seleccionados);
+
+    $lista_ruts = implode(',', $clientes_limpios);
+
+    $consulta = "SELECT * FROM clientes WHERE Rut IN ($lista_ruts) ORDER BY Nombre ASC";
+    $resultado = mysqli_query($conexion, $consulta);
+
+} else {
+    die("No se seleccionaron clientes para generar el PDF.");
 }
-
-$consulta = "SELECT * FROM clientes $filtro ORDER BY nombre ASC";
-$resultado = mysqli_query($conexion, $consulta);
 
 // Crear PDF
 $pdf = new MYPDF('P', 'mm', 'A4', true, 'UTF-8', false);
@@ -40,7 +46,7 @@ $pdf->SetFont('helvetica', 'B', 16);
 $pdf->Cell(0, 10, 'Listado de Clientes APR Nontuela', 0, 1, 'C');
 $pdf->Ln(3);
 
-// Encabezados
+// Tabla
 $tbl = '
 <table border="1" cellpadding="5">
     <thead>
@@ -74,7 +80,6 @@ $tbl .= '</tbody></table>';
 $pdf->SetFont('helvetica', '', 10);
 $pdf->writeHTML($tbl, true, false, false, false, '');
 
-// Salida
 $pdf->Output('clientes_apr_nontuela.pdf', 'I');
 ?>
 

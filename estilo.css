@@ -3,11 +3,15 @@ body {
     padding-top: 80px;
     margin: 0;
     background-size:cover;
-    background-image: url("71d074e8-5a95-4920-990f-85e0db859e0e.jpg") ;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
     color: #2c3e50;
+    
+    display: flex;
+    align-items: center;
+    margin: 0;
+    justify-content: center;
 }
 .container{
     padding: 1px;
@@ -30,13 +34,7 @@ p {
     line-height: 1.6;
 }
 
-.container_2 {
-    background-color: #ffd700;
-    justify-content: center;
-    text-align: center;
-    max-width: 400px;
-    width: 100%;
-}
+
 
 /* NAVBAR */
 nav {
@@ -59,7 +57,7 @@ nav a {
 
 .lead {
     font-size: 1.25rem;
-    color:rgb(21, 17, 29) !important; /* Amarillo claro para destacar sobre azul oscuro */
+    color:rgb(21, 17, 29) !important; 
     font-weight: 800;
     text-align: center;
     margin-top: 1rem;
@@ -101,7 +99,32 @@ footer{
     vertical-align: middle;
     margin-right: 8px;
 }
-
+#fondo3d {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+.login-container {
+            background-color:rgb(41, 70, 130);
+            padding: 2rem 3rem; 
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+            width: 100%;
+            max-width: 400px;
+            margin: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            
+        }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 /* Animación opcional */
 @keyframes brillo {
     from {
@@ -122,4 +145,20 @@ footer{
     font-size: 1.25rem;
     color: #555;
 }
+@media (max-width: 768px) {
+    .titulo-animado {
+        font-size: 24px;
+        text-align: center;
+    }
+    .table-responsive{
+        width: 100%;
+        height: auto;
 
+    }
+    .login-container{
+        height: auto;
+        width: 50%;
+        position:static;
+        
+    }
+}

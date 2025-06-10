@@ -108,46 +108,6 @@ if (!isset($_SESSION['usuario'])) {
 
     </div>
 </nav>
-<style>
-    * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-
- body {
-            font-family: 'Poppins', sans-serif;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-        }
-/* Fondo 3D en segundo plano */
-#fondo3d {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-}
-
-.login-container {
-            background-color:rgb(41, 70, 130);
-            padding: 2rem 3rem; 
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.7);
-            width: 100%;
-            max-width: 400px;
-            margin: 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-  
-</style>
 <?php
 $seccion = $_GET['seccion'] ?? 'inicio';
  if ($seccion == 'inicio') {
@@ -162,7 +122,7 @@ $seccion = $_GET['seccion'] ?? 'inicio';
     if ($seccion == 'registrar_cliente') {
         ?>
         <!-- Formulario de registro de cliente -->
-        <div class="login-container " >
+        <div class="login-container" >
             <form action="registroclientes.php" method="POST" >
                 <h2 class="titulo-animado mb-4 text-center">Registrar Cliente</h2>
                 <div class="mb-3">
@@ -304,6 +264,7 @@ $seccion = $_GET['seccion'] ?? 'inicio';
                     <?php if (!empty($_GET['ver_todo'])) echo 'checked'; ?>>
                 <label class="form-check-label" for="ver_todo">Ver todo el historial</label>
             </div>
+    </div>            
 
             <button type="submit" class="btn btn-primary w-100">Filtrar</button>
         </form>
@@ -354,8 +315,6 @@ $seccion = $_GET['seccion'] ?? 'inicio';
             </div>
         </form>
     <?php endif; ?>
-</div>
-
 <!-- Scripts -->
 <script>
     function formatearRut(input) {
@@ -447,7 +406,7 @@ if ($seccion == 'consulta_clientes') {
 
             <button type="submit" class="btn btn-primary w-100">Buscar</button>
         </form>
-    
+</div>    
     <script>
         function formatearRut(input) {
             let valor = input.value.replace(/\./g, '').replace('-', '').replace(/[^0-9kK]/g, '');
@@ -458,26 +417,17 @@ if ($seccion == 'consulta_clientes') {
             } else {
                 input.value = valor;
             }
-        }
-
-        document.getElementById('ver_todos').addEventListener('change', function () {
-            document.getElementById('rut_cliente').disabled = this.checked;
-        });
-
-        // Al cargar la página
-        window.addEventListener('DOMContentLoaded', function () {
-            if (document.getElementById('ver_todos').checked) {
-                document.getElementById('rut_cliente').disabled = true;
-            }
-        });
+        }  
     </script>
 
-    <?php if ($resultado): ?>
+ <?php if ($resultado): ?>
+        <form method="POST" action="generar_pdf_clientes.php" target="_blank" id="formClientes">
         <div class="card bg-light p-4 shadow mt-4">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover">
                     <thead class="table-secondary text-center">
                         <tr>
+                            <th></th>
                             <th>RUT</th>
                             <th>Nombre</th>
                             <th>Email</th>
@@ -488,6 +438,7 @@ if ($seccion == 'consulta_clientes') {
                         <?php if (mysqli_num_rows($resultado) > 0): ?>
                             <?php while ($fila = mysqli_fetch_assoc($resultado)): ?>
                                 <tr class="text-center">
+                                    <td><input type="checkbox" name="clientes_seleccionados[]" value="<?php echo $fila['Rut']; ?>"></td>
                                     <td><?php echo $fila['Rut']; ?></td>
                                     <td><?php echo $fila['Nombre']; ?></td>
                                     <td><?php echo $fila['Email']; ?></td>
@@ -500,19 +451,43 @@ if ($seccion == 'consulta_clientes') {
                     </tbody>
                 </table>
             </div>
-
-            <?php if (mysqli_num_rows($resultado) > 0): ?>
-                <form method="GET" action="generar_pdf_clientes.php" target="_blank" class="text-center mt-3">
-                    <input type="hidden" name="rut_cliente" value="<?php echo $rut_cliente; ?>">
-                    <?php if ($ver_todos): ?>
-                        <input type="hidden" name="ver_todos" value="1">
-                    <?php endif; ?>
-                    <button type="submit" class="btn btn-danger">Generar PDF</button>
-                </form>
-            <?php endif; ?>
+            <button type="submit" class="btn btn-danger mt-3">Generar PDF </button>
         </div>
-    <?php endif; ?>
-</div><?php
+    </form>
+<?php endif; ?>
+                    <!--Scripts -->
+<script>
+    document.getElementById('ver_todos').addEventListener('change',function(){
+        const disabled = this.checked;
+        document.getElementById('rut_cliente').disabled= disabled;
+        });
+    window.addEventListener('DOMContentLoaded', function(){
+        const checkbox= document.getElementById('ver_todos');
+            if (checkbox.checked){
+                document.getElementById('rut_cliente').disabled=true;
+                }});
+    document.querySelector('form[action=""]').addEventListener('submit', function(e){
+        const verTodos= document.getElementById('ver_todos').checked;
+        const rutCliente = document.getElementById('rut_cliente').value.trim();
+            if (!verTodos && rutCliente === ''){
+                e.preventDefault();
+                alert('Por favor, ingrese un cliente o ver todos los clientes');
+                }
+                });
+    document.getElementById('ver_todos')?.addEventListener('change', function (){
+        const checkboxes = document.querySelectorAll('input[name="clientes_seleccionados[]"]');
+        checkboxes.forEach(cb => cb.checked= this.checked);
+                });
+    document.getElementById('formClientes')?.addEventListener('submit', function(e){
+        const seleccionados= document.querySelectorAll('input[name="clientes_seleccionados[]"]:checked');
+            if (seleccionados.length === 0){
+                e.preventDefault();
+                alert('Por favor, ingrese al menos un cliente');
+                }});
+                        
+
+</script>
+<?php
 }if($seccion == 'estado_ventas'){
     $resultado= null;
     $filtro= "";
