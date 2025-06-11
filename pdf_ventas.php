@@ -2,7 +2,7 @@
 require_once('tcpdf/tcpdf.php');
 require_once('conexionapr.php');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ventas_seleccionadas'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['ventas_seleccionadas'])) {
     $ventas_ids = $_POST['ventas_seleccionadas'];
     $ids_str = implode(",", array_map('intval', $ventas_ids));
     $consulta = "SELECT * FROM ventas WHERE id IN ($ids_str) ORDER BY fecha_venta DESC";
@@ -38,14 +38,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ventas_seleccionadas'
     <table border="1" cellpadding="3">
         <thead>
             <tr style="background-color:#f0f0f0;">
-                <th><strong>ID</strong></th>
-                <th><strong>Cliente</strong></th>
-                <th><strong>RUT</strong></th>
-                <th><strong>Metros³</strong></th>
-                <th><strong>Valor M³</strong></th>
-                <th><strong>Total</strong></th>
-                <th><strong>Fecha</strong></th>
-                <th><strong>Estado</strong></th>
+                <th width="5%"><strong>ID</strong></th>
+                <th width="20%"><strong>Cliente</strong></th>
+                <th width="12%"><strong>RUT</strong></th>
+                <th width="10%"><strong>Metros³</strong></th>
+                <th width="13%"><strong>Valor M³</strong></th>
+                <th width="13%"><strong>Total</strong></th>
+                <th width="17%"><strong>Fecha</strong></th>
+                <th width="10%"><strong>Estado</strong></th>
             </tr>
         </thead>
         <tbody>';
@@ -56,28 +56,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ventas_seleccionadas'
         while ($fila = mysqli_fetch_assoc($resultado)) {
             $tbl_body .= '
             <tr>
-                <td>' . $fila['id'] . '</td>
-                <td>' . htmlspecialchars($fila['nombre_cliente']) . '</td>
-                <td>' . htmlspecialchars($fila['rut_cliente']) . '</td>
-                <td>' . $fila['metros_cubicos'] . '</td>
-                <td>$' . number_format($fila['valor_m3'], 0, ',', '.') . '</td>
-                <td>$' . number_format($fila['total'], 0, ',', '.') . '</td>
-                <td>' . date('d/m/Y H:i', strtotime($fila['fecha_venta'])) . '</td>
-                <td>' . htmlspecialchars($fila ['Estado']) . '</td>
-                </tr>';
+                <td width="5%">' . $fila['id'] . '</td>
+                <td width="20%">' . htmlspecialchars($fila['nombre_cliente']) . '</td>
+                <td width="12%">' . htmlspecialchars($fila['rut_cliente']) . '</td>
+                <td width="10%">' . $fila['metros_cubicos'] . '</td>
+                <td width="13%">$' . number_format($fila['valor_m3'], 0, ',', '.') . '</td>
+                <td width="13%">$' . number_format($fila['total'], 0, ',', '.') . '</td>
+                <td width="17%">' . date('d/m/Y H:i', strtotime($fila['fecha_venta'])) . '</td>
+                <td width="10%">' . htmlspecialchars($fila['Estado']) . '</td>
+            </tr>';
         }
     } else {
         $tbl_body .= '
             <tr>
-                <td colspan="7" align="center">No se encontraron ventas seleccionadas.</td>
+                <td colspan="8" align="center">No se encontraron ventas seleccionadas.</td>
             </tr>';
     }
 
     $tbl_footer = '</tbody></table>';
 
-    // Imprimir la tabla completa
     $pdf->writeHTML($tbl_header . $tbl_body . $tbl_footer, true, false, true, false, '');
-
     $pdf->Output('ventas_seleccionadas_apr_nontuela.pdf', 'I');
 } else {
     echo "No se seleccionaron ventas para generar el PDF.";
