@@ -269,52 +269,53 @@ $seccion = $_GET['seccion'] ?? 'inicio';
             <button type="submit" class="btn btn-primary w-100">Filtrar</button>
         </form>
     </div>
-
-    <!-- Tabla de resultados con selección -->
-    <?php if ($mostrar_tabla && isset($resultado)): ?>
-        <form method="POST" action="pdf_ventas.php" id="formVentas">
-            <input type="hidden" name="modo" value="seleccion">
-            <div class="card bg-light p-4 shadow">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-primary text-center">
+<?php if ($mostrar_tabla && isset($resultado)): ?>
+    <form method="POST" action="pdf_ventas.php" target="_blank" id="formVentas">
+        <input type="hidden" name="modo" value="seleccion">
+        <div class="card bg-light p-4 shadow">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-primary text-center">
+                        <tr>
+                            <th></th>
+                            <th style="width:5%;">ID</th>
+                            <th style="width:20%;">Cliente</th>
+                            <th style="width:12%;">RUT</th>
+                            <th style="width:10%;">Metros³</th>
+                            <th style="width:13%;">Valor M³</th>
+                            <th style="width:13%;">Total</th>
+                            <th style="width:17%;">Fecha</th>
+                            <th style="width:10%;">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (mysqli_num_rows($resultado) > 0): ?>
+                            <?php while ($fila = mysqli_fetch_assoc($resultado)): ?>
+                                <tr class="text-center">
+                                    <td><input type="checkbox" name="ventas_seleccionadas[]" value="<?php echo $fila['id']; ?>"></td>
+                                    <td style="width:5%;"><?php echo $fila['id']; ?></td>
+                                    <td style="width:20%;"><?php echo htmlspecialchars($fila['nombre_cliente']); ?></td>
+                                    <td style="width:12%;"><?php echo htmlspecialchars($fila['rut_cliente']); ?></td>
+                                    <td style="width:10%;"><?php echo $fila['metros_cubicos']; ?></td>
+                                    <td style="width:13%;">$<?php echo number_format($fila['valor_m3'], 0, ',', '.'); ?></td>
+                                    <td style="width:13%;">$<?php echo number_format($fila['total'], 0, ',', '.'); ?></td>
+                                    <td style="width:17%;"><?php echo date('d/m/Y H:i', strtotime($fila['fecha_venta'])); ?></td>
+                                    <td style="width:10%;"><?php echo htmlspecialchars($fila['Estado']); ?></td>
+                                </tr>
+                            <?php endwhile; ?>
+                        <?php else: ?>
                             <tr>
-                                <th></th>
-                                <th>ID</th>
-                                <th>Cliente</th>
-                                <th>RUT</th>
-                                <th>Metros³</th>
-                                <th>Valor M³</th>
-                                <th>Total</th>
-                                <th>Fecha</th>
-                                <th>Estado</th>
+                                <td colspan="9" class="text-center">No se encontraron resultados para el filtro.</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (mysqli_num_rows($resultado) > 0): ?>
-                                <?php while ($fila = mysqli_fetch_assoc($resultado)): ?>
-                                    <tr class="text-center">
-                                        <td><input type="checkbox" name="ventas_seleccionadas[]" value="<?php echo $fila['id']; ?>"></td>
-                                        <td><?php echo $fila['id']; ?></td>
-                                        <td><?php echo $fila['nombre_cliente']; ?></td>
-                                        <td><?php echo $fila['rut_cliente']; ?></td>
-                                        <td><?php echo $fila['metros_cubicos']; ?></td>
-                                        <td>$<?php echo number_format($fila['valor_m3'], 0, ',', '.'); ?></td>
-                                        <td>$<?php echo number_format($fila['total'], 0, ',', '.'); ?></td>
-                                        <td><?php echo date('d/m/Y H:i', strtotime($fila['fecha_venta'])); ?></td>
-                                        <td><?php echo $fila['Estado']; ?></td>
-                                    </tr>
-                                <?php endwhile; ?>
-                            <?php else: ?>
-                                <tr><td colspan="9" class="text-center">No se encontraron resultados para el filtro.</td></tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <button type="submit" class="btn btn-danger mt-3">Generar PDF de seleccionados</button>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
-        </form>
-    <?php endif; ?>
+            <button type="submit" class="btn btn-danger mt-3">Generar PDF de seleccionados</button>
+        </div>
+    </form>
+<?php endif; ?>
+
 <!-- Scripts -->
 <script>
     function formatearRut(input) {
