@@ -2,6 +2,9 @@
 require_once('tcpdf/tcpdf.php');
 require_once('conexionapr.php');
 
+// Evitar cualquier salida antes de generar el PDF
+ob_clean(); // Limpiar el buffer de salida si existe
+
 class MYPDF extends TCPDF {
     public function Footer() {
         $this->SetY(-45);
@@ -12,39 +15,51 @@ class MYPDF extends TCPDF {
             $this->Cell(0, 8, 'Logo no encontrado', 0, 1, 'C');
         }
         $this->SetY(-20);
-        $this->SetFont('helvetica', 'I', 9);
+        $this->SetFont('helvetica', 'I', 7);
         $this->Cell(0, 20, 'VENTA AGUA A GRANEL APR NONTUELA', 0, 0, 'C');
     }
 }
 
-// Verificar si llegan clientes seleccionados por POST
-if (!empty($_POST['clientes_seleccionados'])) {
+// Verificar si se seleccionaron clientes por POST
+if (isset($_POST['clientes_seleccionados']) && !empty($_POST['clientes_seleccionados'])) {
     $clientes_seleccionados = $_POST['clientes_seleccionados'];
 
-    // Sanitizar y preparar para consulta IN
+    // Sanitizar los RUTs y preparar la consulta IN
     $clientes_limpios = array_map(function($rut) use ($conexion) {
-        return "'" . mysqli_real_escape_string($conexion, $rut) . "'";
+        return "'" . mysqli_real_escape_string($conexion, $rut) . "'"; 
     }, $clientes_seleccionados);
 
     $lista_ruts = implode(',', $clientes_limpios);
 
+    // Crear la consulta SQL con los RUTs seleccionados
     $consulta = "SELECT * FROM clientes WHERE Rut IN ($lista_ruts) ORDER BY Nombre ASC";
     $resultado = mysqli_query($conexion, $consulta);
 
+    if (!$resultado || mysqli_num_rows($resultado) == 0) {
+        die("No se encontraron clientes.");
+    }
+} elseif (isset($_POST['seleccionar_todos']) && $_POST['seleccionar_todos'] == 'todos') {
+    // Si el botón "Seleccionar Todos" es presionado
+    $consulta = "SELECT * FROM clientes ORDER BY Nombre ASC";
+    $resultado = mysqli_query($conexion, $consulta);
+    
+    if (!$resultado || mysqli_num_rows($resultado) == 0) {
+        die("No se encontraron clientes.");
+    }
 } else {
     die("No se seleccionaron clientes para generar el PDF.");
 }
 
-// Crear PDF
+// Crear el PDF
 $pdf = new MYPDF('P', 'mm', 'A4', true, 'UTF-8', false);
-$pdf->SetMargins(12, 10, 12);
+$pdf->SetMargins(12, 9, 12);
 $pdf->SetAutoPageBreak(true, 50);
 $pdf->AddPage();
 
-// Título
-$pdf->SetFont('helvetica', 'B', 16);
-$pdf->Cell(0, 10, 'Listado de Clientes APR Nontuela', 0, 1, 'C');
-$pdf->Ln(3);
+// Título del PDF
+$pdf->SetFont('helvetica', 'B', 7);
+$pdf->Cell(0, 5, 'Listado de Clientes APR Nontuela', 0, 1, 'C');
+$pdf->Ln(1);
 
 // Tabla
 $tbl = '
@@ -77,9 +92,10 @@ if (mysqli_num_rows($resultado) > 0) {
 }
 
 $tbl .= '</tbody></table>';
-$pdf->SetFont('helvetica', '', 10);
-$pdf->writeHTML($tbl, true, false, false, false, '');
 
+// Escribir el contenido de la tabla en el PDF
+$pdf->writeHTML($tbl, true, false, true, false, '');
+
+// Salida del PDF
 $pdf->Output('clientes_apr_nontuela.pdf', 'I');
 ?>
-

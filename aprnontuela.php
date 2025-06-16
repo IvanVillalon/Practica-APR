@@ -271,49 +271,56 @@ $seccion = $_GET['seccion'] ?? 'inicio';
     </div>
 <?php if ($mostrar_tabla && isset($resultado)): ?>
     <form method="POST" action="pdf_ventas.php" target="_blank" id="formVentas">
-        <input type="hidden" name="modo" value="seleccion">
-        <div class="card bg-light p-4 shadow">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-primary text-center">
-                        <tr>
-                            <th></th>
-                            <th style="width:5%;">ID</th>
-                            <th style="width:20%;">Cliente</th>
-                            <th style="width:12%;">RUT</th>
-                            <th style="width:10%;">Metros³</th>
-                            <th style="width:13%;">Valor M³</th>
-                            <th style="width:13%;">Total</th>
-                            <th style="width:17%;">Fecha</th>
-                            <th style="width:10%;">Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (mysqli_num_rows($resultado) > 0): ?>
-                            <?php while ($fila = mysqli_fetch_assoc($resultado)): ?>
-                                <tr class="text-center">
-                                    <td><input type="checkbox" name="ventas_seleccionadas[]" value="<?php echo $fila['id']; ?>"></td>
-                                    <td style="width:5%;"><?php echo $fila['id']; ?></td>
-                                    <td style="width:20%;"><?php echo htmlspecialchars($fila['nombre_cliente']); ?></td>
-                                    <td style="width:12%;"><?php echo htmlspecialchars($fila['rut_cliente']); ?></td>
-                                    <td style="width:10%;"><?php echo $fila['metros_cubicos']; ?></td>
-                                    <td style="width:13%;">$<?php echo number_format($fila['valor_m3'], 0, ',', '.'); ?></td>
-                                    <td style="width:13%;">$<?php echo number_format($fila['total'], 0, ',', '.'); ?></td>
-                                    <td style="width:17%;"><?php echo date('d/m/Y H:i', strtotime($fila['fecha_venta'])); ?></td>
-                                    <td style="width:10%;"><?php echo htmlspecialchars($fila['Estado']); ?></td>
-                                </tr>
-                            <?php endwhile; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="9" class="text-center">No se encontraron resultados para el filtro.</td>
+    <input type="hidden" name="modo" value="seleccion"> <!-- Para el caso de las ventas seleccionadas -->
+    
+    <div class="card bg-light p-4 shadow">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th></th>
+                        <th style="width:5%;">ID</th>
+                        <th style="width:20%;">Cliente</th>
+                        <th style="width:12%;">RUT</th>
+                        <th style="width:10%;">Metros³</th>
+                        <th style="width:13%;">Valor M³</th>
+                        <th style="width:13%;">Total</th>
+                        <th style="width:17%;">Fecha</th>
+                        <th style="width:10%;">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (mysqli_num_rows($resultado) > 0): ?>
+                        <?php while ($fila = mysqli_fetch_assoc($resultado)): ?>
+                            <tr class="text-center">
+                                <td><input type="checkbox" name="ventas_seleccionadas[]" value="<?php echo $fila['id']; ?>"></td>
+                                <td style="width:5%;"><?php echo $fila['id']; ?></td>
+                                <td style="width:20%;"><?php echo htmlspecialchars($fila['nombre_cliente']); ?></td>
+                                <td style="width:12%;"><?php echo htmlspecialchars($fila['rut_cliente']); ?></td>
+                                <td style="width:10%;"><?php echo $fila['metros_cubicos']; ?></td>
+                                <td style="width:13%;">$<?php echo number_format($fila['valor_m3'], 0, ',', '.'); ?></td>
+                                <td style="width:13%;">$<?php echo number_format($fila['total'], 0, ',', '.'); ?></td>
+                                <td style="width:17%;"><?php echo date('d/m/Y H:i', strtotime($fila['fecha_venta'])); ?></td>
+                                <td style="width:10%;"><?php echo htmlspecialchars($fila['Estado']); ?></td>
                             </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-            <button type="submit" class="btn btn-danger mt-3">Generar PDF de seleccionados</button>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="9" class="text-center">No se encontraron resultados para el filtro.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
-    </form>
+        
+        <!-- Botón para generar PDF con ventas seleccionadas -->
+        <button type="submit" class="btn btn-danger mt-3">Generar PDF de seleccionados</button><br>
+
+        <!-- Botón para generar PDF con todas las ventas -->
+        <button type="submit" name="seleccionar_todos" value="todos" class="btn btn-success w-100">Generar PDF con todas las ventas</button>
+    </div>
+</form>
+
 <?php endif; ?>
 
 <!-- Scripts -->
@@ -363,131 +370,153 @@ $seccion = $_GET['seccion'] ?? 'inicio';
     });
 
     document.getElementById('formVentas')?.addEventListener('submit', function (e) {
-        const seleccionados = document.querySelectorAll('input[name="ventas_seleccionadas[]"]:checked');
-        if (seleccionados.length === 0) {
-            e.preventDefault();
-            alert('Por favor, seleccione al menos una venta para generar el PDF.');
-        }
-    });
+    // Si se presionó el botón de "Generar PDF con todas las ventas", no se verifica si hay ventas seleccionadas
+    if (document.querySelector('button[name="seleccionar_todos"]:focus')) {
+        return; // Si el botón "Generar PDF con todas las ventas" está enfocado, no se hace nada.
+    }
+
+    // Verificar si hay ventas seleccionadas
+    const seleccionados = document.querySelectorAll('input[name="ventas_seleccionadas[]"]:checked');
+    if (seleccionados.length === 0) {
+        e.preventDefault();
+        alert('Por favor, seleccione al menos una venta para generar el PDF.');
+    }
+});
+
 </script>
 <?php } 
 if ($seccion == 'consulta_clientes') {
-    $resultado = null;
-    $filtro = "";
-    $rut_cliente = "";
-    $ver_todos = !empty($_GET['ver_todos']);
 
-    if (!empty($_GET['rut_cliente']) || $ver_todos) {
-        if ($ver_todos) {
-            $filtro = "";
+
+// Asumiendo que ya tienes la conexión a la base de datos
+
+$seccion = 'consulta_clientes';
+$resultado = null;
+$filtro = "";
+$rut_cliente = "";
+$ver_todos = !empty($_GET['ver_todos']);
+
+if (!empty($_GET['rut_cliente']) || $ver_todos) {
+    if ($ver_todos) {
+        $filtro = "";
+    } else {
+        $rut_cliente = mysqli_real_escape_string($conexion, $_GET['rut_cliente']);
+        $filtro = "WHERE Rut LIKE '%$rut_cliente%'";
+    }
+
+    $consulta = "SELECT * FROM clientes $filtro ORDER BY Nombre ASC";
+    $resultado = mysqli_query($conexion, $consulta);
+}
+?>
+
+<div class="login-container">
+    <h2 class="titulo-animado mb-4 text-center">Consulta de Clientes</h2>
+    <form method="GET" action="">
+        <input type="hidden" name="seccion" value="consulta_clientes">
+
+        <div class="mb-3">
+            <label for="rut_cliente" class="form-label">Buscar por RUT:</label>
+            <input type="text" class="form-control" id="rut_cliente" name="rut_cliente" placeholder="Ej: 12.345.678-9" maxlength="12" pattern="\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]" value="<?php echo $rut_cliente; ?>" oninput="formatearRut(this)" <?php if ($ver_todos) echo 'disabled'; ?>>
+        </div>
+
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="ver_todos" name="ver_todos" value="1" <?php if ($ver_todos) echo 'checked'; ?>>
+            <label class="form-check-label" for="ver_todos">Ver todos los clientes</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Buscar</button>
+    </form>
+</div>
+
+<script>
+    // Función para formatear el RUT
+    function formatearRut(input) {
+        let valor = input.value.replace(/\./g, '').replace('-', '').replace(/[^0-9kK]/g, '');
+        if (valor.length > 1) {
+            let cuerpo = valor.slice(0, -1);
+            let dv = valor.slice(-1).toUpperCase();
+            input.value = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + '-' + dv;
         } else {
-            $rut_cliente = mysqli_real_escape_string($conexion, $_GET['rut_cliente']);
-            $filtro = "WHERE Rut LIKE '%$rut_cliente%'";
+            input.value = valor;
+        }
+    }  
+</script>
+
+<?php if ($resultado): ?>
+ <form method="POST" action="generar_pdf_clientes.php" target="_blank" id="formClientes">
+    <div class="card bg-light p-4 shadow mt-4">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-secondary text-center">
+                    <tr>
+                        <th></th>
+                        <th>RUT</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Contacto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (mysqli_num_rows($resultado) > 0): ?>
+                        <?php while ($fila = mysqli_fetch_assoc($resultado)): ?>
+                            <tr class="text-center">
+                                <td><input type="checkbox" name="clientes_seleccionados[]" value="<?php echo $fila['Rut']; ?>"></td>
+                                <td><?php echo $fila['Rut']; ?></td>
+                                <td><?php echo $fila['Nombre']; ?></td>
+                                <td><?php echo $fila['Email']; ?></td>
+                                <td><?php echo $fila['Contacto']; ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr><td colspan="4" class="text-center">No se encontraron clientes.</td></tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+        <button type="button" class="btn btn-danger mt-3" id="generateSelectedPdf">Generar PDF Seleccionados</button>
+        <button type="button" class="btn btn-danger mt-3" id="generateAllPdf">Generar PDF Todos</button>
+    </div>
+</form>
+
+<?php endif; ?>
+
+<!--Scripts -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const formClientes = document.getElementById('formClientes');
+    const btnGenerarSeleccionados = document.getElementById('generateSelectedPdf');
+    const btnGenerarTodos = document.getElementById('generateAllPdf');
+
+    // Funcionalidad del botón "Generar PDF Seleccionados"
+    btnGenerarSeleccionados.addEventListener('click', function (e) {
+        e.preventDefault(); // Evita el envío del formulario si no hay selección
+
+        // Verificar si hay al menos un cliente seleccionado
+        const checkboxes = document.querySelectorAll('input[name="clientes_seleccionados[]"]:checked');
+        if (checkboxes.length === 0) {
+            alert('Por favor, seleccione al menos un cliente para generar el PDF.');
+            return; // Si no hay selección, no enviamos el formulario
         }
 
-        $consulta = "SELECT * FROM clientes $filtro ORDER BY Nombre ASC";
-        $resultado = mysqli_query($conexion, $consulta);
-    }
-?>
-<div class="login-container">
-    
-        <h2 class="titulo-animado mb-4 text-center">Consulta de Clientes</h2>
-        <form method="GET" action="">
-            <input type="hidden" name="seccion" value="consulta_clientes">
+        // Si hay selección, enviamos el formulario
+        formClientes.submit();
+    });
 
-            <div class="mb-3">
-                <label for="rut_cliente" class="form-label">Buscar por RUT:</label>
-                <input type="text" class="form-control" id="rut_cliente" name="rut_cliente" placeholder="Ej: 12.345.678-9" maxlength="12" pattern="\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]" value="<?php echo $rut_cliente; ?>" oninput="formatearRut(this)" <?php if ($ver_todos) echo 'disabled'; ?>>
-            </div>
-
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="ver_todos" name="ver_todos" value="1" <?php if ($ver_todos) echo 'checked'; ?>>
-                <label class="form-check-label" for="ver_todos">Ver todos los clientes</label>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">Buscar</button>
-        </form>
-</div>    
-    <script>
-        function formatearRut(input) {
-            let valor = input.value.replace(/\./g, '').replace('-', '').replace(/[^0-9kK]/g, '');
-            if (valor.length > 1) {
-                let cuerpo = valor.slice(0, -1);
-                let dv = valor.slice(-1).toUpperCase();
-                input.value = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + '-' + dv;
-            } else {
-                input.value = valor;
-            }
-        }  
-    </script>
-
- <?php if ($resultado): ?>
-        <form method="POST" action="generar_pdf_clientes.php" target="_blank" id="formClientes">
-        <div class="card bg-light p-4 shadow mt-4">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-secondary text-center">
-                        <tr>
-                            <th></th>
-                            <th>RUT</th>
-                            <th>Nombre</th>
-                            <th>Email</th>
-                            <th>Contacto</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (mysqli_num_rows($resultado) > 0): ?>
-                            <?php while ($fila = mysqli_fetch_assoc($resultado)): ?>
-                                <tr class="text-center">
-                                    <td><input type="checkbox" name="clientes_seleccionados[]" value="<?php echo $fila['Rut']; ?>"></td>
-                                    <td><?php echo $fila['Rut']; ?></td>
-                                    <td><?php echo $fila['Nombre']; ?></td>
-                                    <td><?php echo $fila['Email']; ?></td>
-                                    <td><?php echo $fila['Contacto']; ?></td>
-                                </tr>
-                            <?php endwhile; ?>
-                        <?php else: ?>
-                            <tr><td colspan="4" class="text-center">No se encontraron clientes.</td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-            <button type="submit" class="btn btn-danger mt-3">Generar PDF </button>
-        </div>
-    </form>
-<?php endif; ?>
-                    <!--Scripts -->
-<script>
-    document.getElementById('ver_todos').addEventListener('change',function(){
-        const disabled = this.checked;
-        document.getElementById('rut_cliente').disabled= disabled;
-        });
-    window.addEventListener('DOMContentLoaded', function(){
-        const checkbox= document.getElementById('ver_todos');
-            if (checkbox.checked){
-                document.getElementById('rut_cliente').disabled=true;
-                }});
-    document.querySelector('form[action=""]').addEventListener('submit', function(e){
-        const verTodos= document.getElementById('ver_todos').checked;
-        const rutCliente = document.getElementById('rut_cliente').value.trim();
-            if (!verTodos && rutCliente === ''){
-                e.preventDefault();
-                alert('Por favor, ingrese un cliente o ver todos los clientes');
-                }
-                });
-    document.getElementById('ver_todos')?.addEventListener('change', function (){
+    // Funcionalidad del botón "Generar PDF Todos"
+    btnGenerarTodos.addEventListener('click', function () {
+        // Marcar todos los checkboxes antes de enviar el formulario
         const checkboxes = document.querySelectorAll('input[name="clientes_seleccionados[]"]');
-        checkboxes.forEach(cb => cb.checked= this.checked);
-                });
-    document.getElementById('formClientes')?.addEventListener('submit', function(e){
-        const seleccionados= document.querySelectorAll('input[name="clientes_seleccionados[]"]:checked');
-            if (seleccionados.length === 0){
-                e.preventDefault();
-                alert('Por favor, ingrese al menos un cliente');
-                }});
-                        
+        checkboxes.forEach(checkbox => checkbox.checked = true);
+
+        // Enviar el formulario
+        formClientes.submit();
+    });
+});
+
 
 </script>
+
+
 <?php
 }if($seccion == 'estado_ventas'){
     $resultado= null;

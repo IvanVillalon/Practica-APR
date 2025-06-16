@@ -2,10 +2,22 @@
 require_once('tcpdf/tcpdf.php');
 require_once('conexionapr.php');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['ventas_seleccionadas'])) {
-    $ventas_ids = $_POST['ventas_seleccionadas'];
-    $ids_str = implode(",", array_map('intval', $ventas_ids));
-    $consulta = "SELECT * FROM ventas WHERE id IN ($ids_str) ORDER BY fecha_venta DESC";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // Verifica si se seleccionaron todas las ventas o si se seleccionaron ventas específicas
+    if (isset($_POST['seleccionar_todos']) && $_POST['seleccionar_todos'] == 'todos') {
+        // Obtener todas las ventas sin filtros
+        $consulta = "SELECT * FROM ventas ORDER BY fecha_venta DESC";
+    } else if (!empty($_POST['ventas_seleccionadas'])) {
+        // Si se seleccionaron ventas específicas
+        $ventas_ids = $_POST['ventas_seleccionadas'];
+        $ids_str = implode(",", array_map('intval', $ventas_ids));
+        $consulta = "SELECT * FROM ventas WHERE id IN ($ids_str) ORDER BY fecha_venta DESC";
+    } else {
+        echo "No se seleccionaron ventas para generar el PDF.";
+        exit();
+    }
+
     $resultado = mysqli_query($conexion, $consulta);
 
     class MYPDF extends TCPDF {
@@ -28,12 +40,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['ventas_seleccionadas
     $pdf->SetAutoPageBreak(true, 50);
     $pdf->AddPage();
 
+    // Título dinámico dependiendo de la fuente de los datos
     $pdf->SetFont('helvetica', 'B', 15);
-    $pdf->Cell(0, 13, 'Ventas Seleccionadas - APR Nontuela', 0, 1, 'C');
+    if (isset($_POST['seleccionar_todos']) && $_POST['seleccionar_todos'] == 'todos') {
+        $pdf->Cell(0, 13, 'Todas las Ventas - APR Nontuela', 0, 1, 'C');
+    } else {
+        $pdf->Cell(0, 13, 'Ventas Seleccionadas - APR Nontuela', 0, 1, 'C');
+    }
     $pdf->Ln(1);
 
+    // Configuración de la tabla
     $pdf->SetFont('helvetica', '', 6);
-
     $tbl_header = '
     <table border="1" cellpadding="3">
         <thead>
@@ -52,6 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['ventas_seleccionadas
 
     $tbl_body = '';
 
+    // Si hay resultados de la consulta
     if (mysqli_num_rows($resultado) > 0) {
         while ($fila = mysqli_fetch_assoc($resultado)) {
             $tbl_body .= '
@@ -69,14 +87,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['ventas_seleccionadas
     } else {
         $tbl_body .= '
             <tr>
-                <td colspan="8" align="center">No se encontraron ventas seleccionadas.</td>
+                <td colspan="8" align="center">No se encontraron ventas.</td>
             </tr>';
     }
 
     $tbl_footer = '</tbody></table>';
 
+    // Escribir el contenido HTML de la tabla
     $pdf->writeHTML($tbl_header . $tbl_body . $tbl_footer, true, false, true, false, '');
-    $pdf->Output('ventas_seleccionadas_apr_nontuela.pdf', 'I');
+
+    // Salida del archivo PDF
+    $pdf->Output('ventas_apr_nontuela.pdf', 'I');
 } else {
     echo "No se seleccionaron ventas para generar el PDF.";
 }
